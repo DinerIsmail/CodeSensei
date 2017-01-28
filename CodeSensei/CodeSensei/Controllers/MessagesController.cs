@@ -1,32 +1,37 @@
 ﻿using System;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Description;
+using CodeSensei.Interfaces;
+using CodeSensei.Models;
 using Microsoft.Bot.Connector;
-using Newtonsoft.Json;
 
-namespace CodeSensei
+namespace CodeSensei.Controllers
 {
-    [BotAuthentication]
     public class MessagesController : ApiController
     {
-        /// <summary>
-        /// POST: api/Messages
-        /// Receive a message from a user and reply to it
-        /// </summary>
-        public async Task<HttpResponseMessage> Post([FromBody]Activity activity)
+        private readonly IAggregator _aggregator;
+
+        public MessagesController()
         {
+            _aggregator = new Aggregator();
+        }
+
+        /// <summary>
+        ///     POST: api/Messages
+        ///     Receive a message from a user and reply to it
+        /// </summary>
+        public async Task<HttpResponseMessage> Post([FromBody] Activity activity)
+        {
+            var list = _aggregator.UserRepository.List();
             if (activity.Type == ActivityTypes.Message)
             {
-                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+                var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
                 // calculate something for us to return
-                int length = (activity.Text ?? string.Empty).Length;
 
                 // return our reply to the user
-                Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
+                var reply = activity.CreateReply($"Your email is {list[0].Email} and password is {list[0].Password}");
                 await connector.Conversations.ReplyToActivityAsync(reply);
             }
             else
