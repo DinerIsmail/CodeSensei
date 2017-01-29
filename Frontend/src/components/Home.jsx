@@ -129,7 +129,7 @@ class Home extends React.Component {
 
                                 that.setState({ currentResource: activities[activities.length-1].text })
 
-                                if (activities[activities.length-1].text.includes("http")) {
+                                if (activities[activities.length-1].text.includes("https")) {
                                   this.addMessageToState(true, "Here, watch this video.");
                                 } else {
                                   this.addMessageToState(true, "Please read the lesson, then click Continue");
@@ -153,7 +153,7 @@ class Home extends React.Component {
   }
 
   renderResource(resource) {
-    if (resource.includes("http")) {
+    if (resource.includes("https")) {
       return (
         <div className="video">
           <iframe style={{position: 'absolute', width: '100%', height: '80%', border: 'none'}} src={resource} frameBorder="0" allowFullScreen></iframe>
