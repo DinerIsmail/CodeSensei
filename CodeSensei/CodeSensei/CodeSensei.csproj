@@ -190,6 +190,7 @@
     <Compile Include="Models\DifficultyLevel.cs" />
     <Compile Include="Models\Entity.cs" />
     <Compile Include="Models\Intention.cs" />
+    <Compile Include="Models\NoMatchingResourceException.cs" />
     <Compile Include="Models\Resource.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserExtensions.cs" />

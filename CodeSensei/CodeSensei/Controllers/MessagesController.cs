@@ -29,19 +29,15 @@ namespace CodeSensei.Controllers
             {
                 var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
 
-                try
-                {
-                    // calculate something for us to return
-                    var resource = GetLink(activity);
-                    // return our reply to the user
-                    var reply = activity.CreateReply(resource.Link, resource.Order.ToString());
-                    await connector.Conversations.ReplyToActivityAsync(reply);
-                }
-                catch (Exception e)
-                {
-                    await connector.Conversations.ReplyToActivityAsync(activity.CreateReply("Sorry! I couldn't find any relevant resources... :("));
-                    return Request.CreateResponse(HttpStatusCode.BadRequest, e.ToString());
-                }
+
+                // calculate something for us to return
+                var resource = GetLink(activity);
+                if (resource == null)
+                    throw new NoMatchingResourceException("The particular resource could not be found!");
+
+                // return our reply to the user
+                var reply = activity.CreateReply(resource.Link, resource.Order.ToString());
+                await connector.Conversations.ReplyToActivityAsync(reply);
             }
             else
             {
@@ -83,34 +79,42 @@ namespace CodeSensei.Controllers
         /// <returns></returns>
         private Resource GetLink(Activity activity)
         {
-            var obj = activity.Text.Split(',');
+            var obj = activity?.Text?.Split(',').Length > 0 ? activity.Text.Split(',') : null;
+            if (obj == null) return null;
+
             var entity = obj[0];
             var diffLevel = obj[1];
             var intent = obj[2];
             var order = "";
-            if (activity.Text.Split(',').Count() > 3)
+
+
+            if (obj.Length > 3)
             {
                 order = obj[3];
             }
+            
 
             if (string.IsNullOrEmpty(entity) || string.IsNullOrEmpty(intent)) return null;
             var entityId = _aggregator.EntitiesRepository.List()
-                .Single(x => string.Equals(x.Description, entity, StringComparison.CurrentCultureIgnoreCase)).Id;
+                .SingleOrDefault(x => string.Equals(x.Description, entity, StringComparison.CurrentCultureIgnoreCase))?
+                .Id;
 
             var difficultyLevel =
                 _aggregator.DifficultyLevelsRepository.List()
-                    .Single(x => string.Equals(x.Description, diffLevel, StringComparison.CurrentCultureIgnoreCase))
+                    .SingleOrDefault(
+                        x => string.Equals(x.Description, diffLevel, StringComparison.CurrentCultureIgnoreCase))?
                     .Id;
             var intentId =
                 _aggregator.IntentionsRepository.List()
-                    .Single(x => string.Equals(x.Description, intent, StringComparison.CurrentCultureIgnoreCase))
+                    .SingleOrDefault(
+                        x => string.Equals(x.Description, intent, StringComparison.CurrentCultureIgnoreCase))?
                     .Id;
 
             if (string.IsNullOrEmpty(order))
             {
                 return
                     _aggregator.ResourcesRepository.List()
-                        .Single(
+                        .SingleOrDefault(
                             x =>
                                 x.EntityId == entityId && x.IntentionId == intentId &&
                                 x.DifficultyLevelId == difficultyLevel && x.Order == 1);
@@ -118,7 +122,7 @@ namespace CodeSensei.Controllers
 
             return
                 _aggregator.ResourcesRepository.List()
-                    .Single(
+                    .SingleOrDefault(
                         x =>
                             x.EntityId == entityId && x.IntentionId == intentId &&
                             x.DifficultyLevelId == difficultyLevel && x.Order == Convert.ToInt32(order));
