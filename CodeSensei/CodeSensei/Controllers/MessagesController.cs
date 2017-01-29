@@ -23,13 +23,13 @@ namespace CodeSensei.Controllers
         ///     POST: api/Messages
         ///     Receive a message from a user and reply to it
         /// </summary>
-        public async Task<HttpResponseMessage> Post([FromBody] Activity activity, string intent = "")
+        public async Task<HttpResponseMessage> Post([FromBody] Activity activity)
         {
             if (activity.Type == ActivityTypes.Message)
             {
                 var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
                 // calculate something for us to return
-                var linkResult = GetLink(activity.Text, intent);
+                var linkResult = GetLink(activity.Text.Split(',')[0], activity.Text.Split(',')[1]);
                 if (string.IsNullOrEmpty(linkResult))
                 {
                     return Request.CreateResponse(HttpStatusCode.BadRequest);
