@@ -8,8 +8,14 @@ namespace CodeSensei.Models
         public Aggregator()
         {
             UserRepository = new UserRepository();
+            EntitiesRepository = new EntitiesRepository();
+            ResourcesRepository = new ResourcesRepository();
+            IntentionsRepository = new IntentionsRepository();
         }
 
         public IUserRepository UserRepository { get; set; }
+        public IEntitiesRepository EntitiesRepository { get; set; }
+        public IResourcesRepository ResourcesRepository { get; set; }
+        public IIntentionsRepository IntentionsRepository { get; set; }
     }
 }
