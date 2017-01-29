@@ -6,5 +6,6 @@
         IEntitiesRepository EntitiesRepository { get; set; }
         IResourcesRepository ResourcesRepository { get; set; }
         IIntentionsRepository IntentionsRepository { get; set; }
+        IDifficultyLevelsRepository DifficultyLevelsRepository { get; set; }
     }
 }

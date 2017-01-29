@@ -15,5 +15,7 @@ namespace CodeSensei.Models
         public DateTime DateAdded { get; set; }
 
         public bool Deleted { get; set; }
+        public int DifficultyLevelId { get; set; }
+        public int? Order { get; set; }
     }
 }

@@ -28,16 +28,20 @@ namespace CodeSensei.Controllers
             if (activity.Type == ActivityTypes.Message)
             {
                 var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                // calculate something for us to return
-                var linkResult = GetLink(activity.Text.Split(',')[0], activity.Text.Split(',')[1]);
-                if (string.IsNullOrEmpty(linkResult))
-                {
-                    return Request.CreateResponse(HttpStatusCode.BadRequest);
-                }
 
-                // return our reply to the user
-                var reply = activity.CreateReply(linkResult);
-                await connector.Conversations.ReplyToActivityAsync(reply);
+                try
+                {
+                    // calculate something for us to return
+                    var resource = GetLink(activity);
+                    // return our reply to the user
+                    var reply = activity.CreateReply(resource.Link, resource.Order.ToString());
+                    await connector.Conversations.ReplyToActivityAsync(reply);
+                }
+                catch (Exception e)
+                {
+                    await connector.Conversations.ReplyToActivityAsync(activity.CreateReply("Sorry! I couldn't find any relevant resources... :("));
+                    return Request.CreateResponse(HttpStatusCode.BadRequest, e.ToString());
+                }
             }
             else
             {
@@ -72,19 +76,52 @@ namespace CodeSensei.Controllers
             return null;
         }
 
-        private string GetLink(string entity, string intent)
+        /// <summary>
+        ///     Handles Activity response message
+        /// </summary>
+        /// <param name="activity"></param>
+        /// <returns></returns>
+        private Resource GetLink(Activity activity)
         {
-            if (string.IsNullOrEmpty(entity) || string.IsNullOrEmpty(intent)) return "";
+            var obj = activity.Text.Split(',');
+            var entity = obj[0];
+            var diffLevel = obj[1];
+            var intent = obj[2];
+            var order = "";
+            if (activity.Text.Split(',').Count() > 3)
+            {
+                order = obj[3];
+            }
+
+            if (string.IsNullOrEmpty(entity) || string.IsNullOrEmpty(intent)) return null;
             var entityId = _aggregator.EntitiesRepository.List()
                 .Single(x => string.Equals(x.Description, entity, StringComparison.CurrentCultureIgnoreCase)).Id;
+
+            var difficultyLevel =
+                _aggregator.DifficultyLevelsRepository.List()
+                    .Single(x => string.Equals(x.Description, diffLevel, StringComparison.CurrentCultureIgnoreCase))
+                    .Id;
             var intentId =
                 _aggregator.IntentionsRepository.List()
                     .Single(x => string.Equals(x.Description, intent, StringComparison.CurrentCultureIgnoreCase))
                     .Id;
+
+            if (string.IsNullOrEmpty(order))
+            {
+                return
+                    _aggregator.ResourcesRepository.List()
+                        .Single(
+                            x =>
+                                x.EntityId == entityId && x.IntentionId == intentId &&
+                                x.DifficultyLevelId == difficultyLevel && x.Order == 1);
+            }
+
             return
                 _aggregator.ResourcesRepository.List()
-                    .Single(x => x.EntityId == entityId && x.IntentionId == intentId)
-                    .Link;
+                    .Single(
+                        x =>
+                            x.EntityId == entityId && x.IntentionId == intentId &&
+                            x.DifficultyLevelId == difficultyLevel && x.Order == Convert.ToInt32(order));
         }
     }
 }
