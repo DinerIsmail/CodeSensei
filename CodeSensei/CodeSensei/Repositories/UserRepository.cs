@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Web.Security;
 using CodeSensei.Interfaces;
 using CodeSensei.Models;
 using Dapper;
@@ -40,6 +41,11 @@ namespace CodeSensei.Repositories
                 conn.Execute("User_Save", d, commandType: CommandType.StoredProcedure);
                 user.Id = d.Get<int>("Id");
             }
+        }
+
+        public void LogoutUser()
+        {
+            FormsAuthentication.SignOut();
         }
     }
 }
