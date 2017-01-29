@@ -44,7 +44,7 @@ body {
 .top_menu .title {
   text-align: center;
   color: #000;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: bold;
 }
 
@@ -196,11 +196,35 @@ body {
 
 .content_area {
   position: absolute;
-  height: 100%;
+  height: 80%;
   width: calc(100% - 400px);
   top: 0;
   right: 0;
   background-color: #fff;
+}
+
+.actions_area {
+  position: absolute;
+  height: 20%;
+  width: calc(100% - 400px);
+  bottom: 0;
+  right: 0;
+  background-color: #fff;
+}
+
+.continue_button {
+  width: 140px;
+  height: 50px;
+  display: inline-block;
+  border-radius: 50px;
+  background-color: #a3d063;
+  border: 2px solid #a3d063;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s linear;
+  text-align: center;
+  float: right;
+  top: 50%;
 }
 
 .video {
@@ -213,4 +237,15 @@ body {
   height: 40px;
   margin-top: 10px;
   margin-left: 10px;
+}
+
+.instructions {
+  margin-left: 10px;
+}
+
+.text_content {
+  white-space: pre-wrap;
+  margin-top: 50px;
+  padding: 20px;
+  font-size: 20px;
 }

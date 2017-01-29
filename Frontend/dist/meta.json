@@ -2,8 +2,8 @@
     "name": "Decacoder platform",
     "build": "DEVELOPMENT",
     "author": "DinerIsmail <ismail.diner@gmail.com>",
-    "sha": "7e1e7ce8c6b0e4e7bf4e95dd87ca39ff0e918031",
-    "build_date": "Sun 29 Jan 2017 10:22:50 GMT",
+    "sha": "1812ef4a65eb3a189ff988403523e99f1045003d",
+    "build_date": "Sun 29 Jan 2017 12:28:17 GMT",
     "uname": "Darwin Diner-MacBook 16.3.0 Darwin Kernel Version 16.3.0: Thu Nov 17 20:23:58 PST 2016; root:xnu-3789.31.2~1/RELEASE_X86_64 x86_64",
     "env": "dev"
 }

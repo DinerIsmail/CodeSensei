@@ -25,15 +25,18 @@ export function setupDirectLine() {
           console.error('Error initializing DirectLine client', err));
 }
 
-export function postActivity(client, conversationId, message, entity, intent, diffLevel) {
-  console.log(client, conversationId, message, entity, intent, diffLevel);
+export function postActivity(client, conversationId, message, entity, intent, diffLevel, order) {
+  let orderParam = order || "";
+  if (orderParam) {
+    orderParam = ',' + orderParam;
+  }
 
   return client.Conversations.Conversations_PostActivity(
       {
           conversationId: conversationId,
           activity: {
               textFormat: 'plain',
-              text: entity + ',' + diffLevel + ',' + intent,
+              text: entity + ',' + diffLevel + ',' + intent + orderParam,
               type: 'message',
               from: {
                   id: directLineClientName,
@@ -45,12 +48,10 @@ export function postActivity(client, conversationId, message, entity, intent, di
 
 export function pollMessages(client, conversationId) {
   console.log('Starting polling messages for conversationId: ' + conversationId);
-  //var watermark = null;
-  //setInterval(() => {
-  return client.Conversations.Conversations_GetActivities({ conversationId: conversationId })
-      .then((response) => {
-          //watermark = response.obj.watermark;
-          return response.obj.activities;
-      });
-  //}, 1000);
+  var watermark = null;
+  return client.Conversations.Conversations_GetActivities({ conversationId: conversationId, watermark: watermark })
+    .then((response) => {
+        watermark = response.obj.watermark;
+        return response.obj.activities;
+    });
 }
